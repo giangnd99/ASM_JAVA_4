@@ -2,64 +2,79 @@ package service.impl;
 
 import dao.VideoDao;
 import dao.impl.VideoDaoImpl;
+import entity.Favorite;
 import entity.Video;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import service.GenericService;
-import service.InterfaceService;
+import service.VideoService;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class VideoServiceImpl extends GenericService<Video> implements InterfaceService {
+public class VideoServiceImpl implements VideoService {
 
     private VideoDao videoDao;
 
-    public VideoServiceImpl(HttpServletRequest request, HttpServletResponse response) {
-        super(request, response);
+    public VideoServiceImpl() {
         this.videoDao = new VideoDaoImpl();
     }
 
+
     @Override
-    public void loadListToPage() throws Exception {
-        List<Video> videos = videoDao.paginate(super.getPageNumber(), super.PAGE_SIZE);
-        String managePage = "/views/user/index.jsp";
-        setupPagination(videoDao.count());
-        request.setAttribute("videos", videos);
-        message = message == null ? "" : message;
-        super.setMessage(messageType, message);
-        super.forward(managePage);
+    public Video save(Video video) {
+        return videoDao.create(video);
     }
 
     @Override
-    public void addEntityFormPage() throws Exception {
-
+    public Video update(Video video) {
+        return videoDao.update(video);
     }
 
     @Override
-    public void editEntityFormPage() throws Exception {
-
+    public Video remove(Video video) {
+        video.setActive(false);
+        return videoDao.update(video);
     }
 
     @Override
-    public void deleteEntityFromPage() throws Exception {
-
+    public Video findById(int id) {
+        return videoDao.get(id);
     }
 
     @Override
-    public void loadEditFormPage() throws Exception {
-
+    public List<Video> listAll() {
+        return videoDao.listAll();
     }
 
     @Override
-    public void loadCreateFormPage() throws Exception {
-
+    public List<Video> findByTitleContaining(String title) {
+        return videoDao.findByTitleContain(title);
     }
 
-    public void showDetails() throws Exception {
-        String detailVideoPage = "/views/user/video-detail.jsp";
-        String href = request.getParameter("id");
-        Video video = videoDao.findByHref(href);
-        super.setObject(video);
-        super.forward(detailVideoPage);
+    @Override
+    public List<Video> findByDescriptionContaining(String description) {
+        return videoDao.findByDescriptionContain(description);
+    }
+
+    @Override
+    public Video findByHref(String href) {
+        return videoDao.findByHref(href);
+    }
+
+    public List<Video> listFavVideoByUser(List<Favorite> favorites) {
+        List<Video> favVideos = new ArrayList<>();
+        List<Video> list = listAll();
+        for (Favorite favorite : favorites) {
+            for (Video video : list) {
+                boolean checkVideoId = favorite.getVideoId().getId().equals(video.getId());
+                if (checkVideoId) {
+                    favVideos.add(video);
+                }
+            }
+        }
+        return favVideos;
+    }
+
+    @Override
+    public List<Video> top5VideoByViews() {
+        return videoDao.sortByViews().subList(0, 5);
     }
 }

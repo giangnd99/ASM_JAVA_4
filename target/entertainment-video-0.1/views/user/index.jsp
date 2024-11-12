@@ -19,13 +19,13 @@
 <c:set var="baseUri" value="${pageContext.request.contextPath}"/>
 <div class="container-fluid tm-container-content tm-mt-60">
     <div class="row mb-4">
-        <h2 class="col-6 tm-text-primary">Video mới nhất</h2>
+        <h2 class="col-6 tm-text-primary">Tất cả</h2>
     </div>
     <div class="row tm-mb-90 tm-gallery">
         <c:forEach var="video" items="${videos}">
             <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 mb-5">
                 <figure class="effect-ming tm-video-item">
-                    <img src="views/user/img/img-03.jpg" alt="Image" class="img-fluid"/>
+                    <img src="${video.poster}" alt="Image" class="img-fluid"/>
                     <figcaption
                             class="d-flex align-items-center justify-content-center"
                     >

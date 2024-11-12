@@ -6,13 +6,17 @@ import java.util.List;
 
 public interface UserService {
 
-    public void save(User user);
+    User save(User user);
 
-    public void update(User user);
+    User update(User user);
 
-    public void delete(int id);
+    boolean delete(int id);
 
-    public User findById(int id);
+    User findById(int id);
 
-    public List<User> listAll();
+    List<User> listAll();
+
+    User findByEmail(String email);
+
+    boolean isExistEmail(String email);
 }

@@ -6,18 +6,21 @@ import jakarta.persistence.Persistence;
 import jakarta.persistence.Query;
 import util.EntityManagerOperation;
 
+import java.lang.reflect.ParameterizedType;
 import java.util.List;
 
 public class GenericDao<E> {
 
     private static final EntityManagerFactory ENTITY_MANAGER_FACTORY;
 
+    private final Class<E> type;
 
     static {
         ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory("asmjava4");
     }
 
     public GenericDao() {
+        this.type = (Class<E>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
     }
 
     public E create(E entity) {
@@ -38,19 +41,17 @@ public class GenericDao<E> {
         });
     }
 
-    public Boolean deleteById(Class<E> type, Object id) {
+    public Boolean deleteById(Object id) {
         excuteInTransaction(entityManager -> {
             E entity = entityManager.find(type, id);
             entityManager.remove(entity);
-            entityManager.flush();
-            entityManager.refresh(entity);
             return true;
         });
         return false;
     }
 
 
-    public E findById(Class<E> type, Object id) {
+    public E findById(Object id) {
         return execute(entityManager -> {
             E entity = entityManager.find(type, id);
             if (entity != null) {
@@ -60,12 +61,12 @@ public class GenericDao<E> {
         });
     }
 
-    public List<E> findAll(Class<E> type) {
+    public List<E> findAll() {
         String query = "select e from " + type.getName() + " e";
         return execute(entityManager -> entityManager.createQuery(query).getResultList());
     }
 
-    public E findOneThingByJpql(Class<E> type, String jpql, Object... params) {
+    public E findOneThingByJpql(String jpql, Object... params) {
         return execute(entityManager -> {
             Query query = entityManager.createQuery(jpql, type);
             for (int i = 0; i < params.length; i++) {
@@ -79,7 +80,7 @@ public class GenericDao<E> {
         });
     }
 
-    public List<E> findManyThingByJpql(Class<E> type, String jpql, Object... params) {
+    public List<E> findManyThingByJpql(String jpql, Object... params) {
         return execute(entityManager -> {
             Query query = entityManager.createQuery(jpql, type);
             for (int i = 0; i < params.length; i++) {
@@ -89,9 +90,9 @@ public class GenericDao<E> {
         });
     }
 
-    public Long count(Class<E> type) {
+    public int count() {
         String jpql = "select count(*) from " + type.getName() + " e";
-        return execute(entityManager -> entityManager.createQuery(jpql, Long.class).getSingleResult());
+        return Integer.parseInt(execute(entityManager -> String.valueOf(entityManager.createQuery(jpql, Long.class).getSingleResult())));
     }
 
     public List<E> paginate(Class<E> type, int page, int size) {

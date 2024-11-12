@@ -9,17 +9,17 @@ import java.util.List;
 public interface HistoryService {
 
 
-    List<Favorite> getFavorites();
+    List<Favorite> getFavoritesByUser(User currentUser);
 
-    List<Share> getShares();
+    List<Share> getSharesByUser(User currentUser);
 
-    void addFavorite();
+    Favorite addFavorite(User currentUser, String href);
 
-    void addShare();
+    Share addShare(User currentUser, String href);
 
-    Favorite findFavoriteById();
+    Favorite findFavoriteById(User currentUser, String href);
 
-    Share findShareById();
+    Share findShareById(User currentUser, String href);
 
-    boolean isLikeOrUnLike();
+    boolean removeFavorite(Favorite favorite);
 }

@@ -25,6 +25,7 @@ public interface VideoDao {
 
     List<Video> findByTitleContain(String keywordTitle);
 
-    List<Video> sortByViews(boolean asc);
+    List<Video> sortByViews();
 
+    List<Video> findByDescriptionContain(String keywordDescription);
 }

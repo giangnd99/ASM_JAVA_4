@@ -15,22 +15,22 @@ public class UserDaoImpl extends GenericDao<User> implements UserDao {
 
     @Override
     public User get(Object id) {
-        return super.findById(User.class, id);
+        return super.findById(id);
     }
 
     @Override
     public boolean delete(Object id) {
-        return super.deleteById(User.class, id);
+        return super.deleteById(id);
     }
 
     @Override
     public List<User> listAll() {
-        return super.findAll(User.class);
+        return super.findAll();
     }
 
     @Override
-    public long count() {
-        return super.count(User.class);
+    public int count() {
+        return super.count();
     }
 
     public List<User> paginate(int page, int size) {

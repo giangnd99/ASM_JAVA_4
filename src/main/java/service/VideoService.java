@@ -1,22 +1,29 @@
 package service;
 
+import entity.Favorite;
 import entity.Video;
 
 import java.util.List;
 
 public interface VideoService {
 
-    public void save(Video video);
+     Video save(Video video);
 
-    public void update(Video video);
+     Video update(Video video);
 
-    public void remove(Video video);
+     Video remove(Video video);
 
-    public Video findById(int id);
+     Video findById(int id);
 
-    public List<Video> listAll();
+     List<Video> listAll();
 
-    public List<Video> findByTitleContaining(String title);
+     List<Video> findByTitleContaining(String title);
 
-    public List<Video> findByDescriptionContaining(String description);
+     List<Video> findByDescriptionContaining(String description);
+
+    Video findByHref(String href);
+
+     List<Video> listFavVideoByUser(List<Favorite> favorites);
+
+     List<Video> top5VideoByViews();
 }

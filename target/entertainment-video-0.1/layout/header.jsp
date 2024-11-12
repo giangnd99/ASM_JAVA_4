@@ -21,15 +21,13 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav ml-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link nav-link-1 active" aria-current="page" href="${baseUri}">Trang chủ</a>
+                    <a class="nav-link nav-link-1" aria-current="page" href="${baseUri}">Trang chủ</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link nav-link-2" href="videos.html">Videos bạn yêu thích</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link nav-link-4" href="contact.html">Các video được chia sẽ</a>
-                </li>
+
                 <c:if test="${loggedUser == null}">
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-2" href="${baseUri}/current-video">Videos vừa xem</a>
+                    </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link nav-link-3 dropdown-toggle" href="" role="button"
                            data-bs-toggle="dropdown"
@@ -47,6 +45,18 @@
                     </li>
                 </c:if>
                 <c:if test="${loggedUser != null}">
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link nav-link-3 dropdown-toggle" href="" role="button"
+                           data-bs-toggle="dropdown"
+                           aria-expanded="false">
+                            Video
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="${baseUri}/favorite-video">Videos bạn yêu thích</a></li>
+                            <li><a class="dropdown-item" href="${baseUri}">video được chia sẽ</a></li>
+                        </ul>
+                    </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link nav-link-3 dropdown-toggle" href="${baseUri}/account-setting" role="button"
                            data-bs-toggle="dropdown"

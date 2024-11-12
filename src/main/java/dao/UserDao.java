@@ -17,7 +17,7 @@ public interface UserDao {
 
     List<User> paginate(int pageNumber, int pageSize);
 
-    long count();
+    int count();
 
     User findByEmail(String email);
 
