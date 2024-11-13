@@ -34,22 +34,6 @@ public class AbstractHandler<T> {
         this.CURRENT_HREF = getCurrentVideoHref();
     }
 
-    public List<T> searchByKeyword(List<T> allEntities, String keyword) throws IllegalAccessException {
-        List<T> resultList = new ArrayList<>();
-        for (T entity : allEntities) {
-            Field[] fields = entity.getClass().getDeclaredFields();
-            for (Field field : fields) {
-                field.setAccessible(true);
-                Object value = field.get(entity);
-                if (value != null && value.toString().toLowerCase().contains(keyword.toLowerCase())) {
-                    resultList.add(entity);
-                    break; // Nếu tìm thấy kết quả khớp, thêm entity vào danh sách và thoát vòng lặp
-                }
-            }
-        }
-        return resultList;
-    }
-
     /**
      * Đọc và gán giá trị các trường từ request vào đối tượng
      *
@@ -158,10 +142,8 @@ public class AbstractHandler<T> {
      * @param paginationHelper Truyền đối tượng để phân trang.
      */
     public void setupPagination(PaginationHelper<T> paginationHelper) {
-        // Tính toán tổng số trang
-        String baseUri = request.getRequestURI();
-        int totalPages = paginationHelper.getPageTotal();
 
+        int totalPages = paginationHelper.getPageTotal();
 
         String prevPageHref = (pageNumber > 1) ? "?pageNumber=" + (pageNumber - 1) : "javascript:void(0);";
         String nextPageHref = (pageNumber < totalPages) ? "?pageNumber=" + (pageNumber + 1) : "javascript:void(0);";

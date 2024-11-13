@@ -1,9 +1,12 @@
 package servlet.handler.request;
 
+import constant.MessageType;
 import entity.Favorite;
+import entity.Share;
 import entity.Video;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import service.EmailService;
 import service.HistoryService;
 import service.VideoService;
 import service.impl.HistoryServiceImpl;
@@ -16,6 +19,7 @@ public class HistoryHandler extends AbstractHandler<Video> {
 
     private HistoryService historyService;
     private VideoService videoService;
+    private EmailService emailService;
 
     public HistoryHandler(HttpServletRequest req, HttpServletResponse resp) {
         super(req, resp);
@@ -36,6 +40,9 @@ public class HistoryHandler extends AbstractHandler<Video> {
                 break;
             case "watch":
                 request.setAttribute("favorite", favorite);
+                break;
+            case "share":
+
             default:
                 break;
         }
@@ -57,5 +64,39 @@ public class HistoryHandler extends AbstractHandler<Video> {
         List<Video> favoriteVideoByUser = videoService.listFavVideoByUser(favoritesByUser);
         request.setAttribute("videos", favoriteVideoByUser);
         request.setAttribute("favUser", favoritesByUser);
+    }
+
+    public void setAllFavoriteToAdmin() {
+        List<Favorite> favorites = historyService.getAllFavorites();
+        request.setAttribute("favorites", favorites);
+    }
+
+    public void doShare() {
+        if (notificationForShare()) {
+            addShare();
+
+        }
+
+    }
+
+    public boolean addShare() {
+        String emails = request.getParameter("emails");
+        Share currentShare = historyService.addShare(getCurrentUser(), CURRENT_HREF, emails);
+        return currentShare != null;
+    }
+
+    boolean notificationForShare() {
+        if (!isLoggedIn()) {
+            setMessage(MessageType.WARNING, "Vui lòng đăng nhập để share");
+            return false;
+        }
+        return true;
+    }
+
+    Share getShareByIdUserAndVideo() {
+        if (isLoggedIn()) {
+            return historyService.findShareById(CURRENT_USER, CURRENT_HREF);
+        }
+        return null;
     }
 }

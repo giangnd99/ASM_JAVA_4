@@ -8,6 +8,7 @@ import java.util.List;
 
 public interface HistoryService {
 
+    List<Favorite> getAllFavorites();
 
     List<Favorite> getFavoritesByUser(User currentUser);
 
@@ -15,7 +16,7 @@ public interface HistoryService {
 
     Favorite addFavorite(User currentUser, String href);
 
-    Share addShare(User currentUser, String href);
+    Share addShare(User currentUser, String href,String emails);
 
     Favorite findFavoriteById(User currentUser, String href);
 

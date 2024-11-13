@@ -27,6 +27,11 @@ public class HistoryServiceImpl implements HistoryService {
     }
 
     @Override
+    public List<Favorite> getAllFavorites() {
+        return favoriteDao.listAll();
+    }
+
+    @Override
     public List<Favorite> getFavoritesByUser(User currentUser) {
         Integer idUser = currentUser.getId();
         return favoriteDao.findByUser(idUser);
@@ -49,7 +54,7 @@ public class HistoryServiceImpl implements HistoryService {
     }
 
     @Override
-    public Share addShare(User currentUser, String href) {
+    public Share addShare(User currentUser, String href,String emails) {
         Video currentVideo = videoDao.findByHref(href);
         Share share = new Share();
         share.setUserId(currentUser);

@@ -6,6 +6,8 @@ import java.util.List;
 
 public interface FavoriteDao {
 
+    List<Favorite> listAll();
+
     List<Favorite> findByUser(Object id);
 
     List<Favorite> findByUserIdAndVideoId(Object userId, Object videoId);

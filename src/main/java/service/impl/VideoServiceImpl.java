@@ -59,6 +59,7 @@ public class VideoServiceImpl implements VideoService {
         return videoDao.findByHref(href);
     }
 
+    @Override
     public List<Video> listFavVideoByUser(List<Favorite> favorites) {
         List<Video> favVideos = new ArrayList<>();
         List<Video> list = listAll();

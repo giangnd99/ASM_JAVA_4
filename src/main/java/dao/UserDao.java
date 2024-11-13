@@ -4,6 +4,7 @@ import entity.User;
 
 import java.util.List;
 
+
 public interface UserDao {
     User create(User t);
 
@@ -19,7 +20,19 @@ public interface UserDao {
 
     int count();
 
+    /* Người dùng u like video v */
+    User findByFavoriteId(Object favoriteId);
+
+    /* Người dùng u unlike video v */
+    List<User> listUserUnlike();
+
+    /* Danh sách các User thích Video ? */
+    List<User> listUserLike(Object videoId);
+
     User findByEmail(String email);
+
+    /* Người dùng u share video v */
+    User findByShareId(Object videoId);
 
     Boolean isExists(Object email);
 }

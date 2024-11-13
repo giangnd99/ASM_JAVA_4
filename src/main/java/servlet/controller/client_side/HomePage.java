@@ -15,7 +15,6 @@ public class HomePage extends HttpServlet {
      *
      */
     private static final long serialVersionUID = 1001950612212965953L;
-
     private VideoHandler videoHandler;
 
     @Override
@@ -24,7 +23,6 @@ public class HomePage extends HttpServlet {
         try {
             videoHandler.loadVideosToHomePage();
         } catch (Exception e) {
-            // Xử lý các ngoại lệ khác
             e.printStackTrace();
         }
     }

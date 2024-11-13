@@ -33,32 +33,37 @@ public class UserDaoImpl extends GenericDao<User> implements UserDao {
         return super.count();
     }
 
+    @Override
+    public User findByFavoriteId(Object userId) {
+        String jpql = "select f.userId from Favorite f where f.userId = :userId";
+        return execute(entityManager -> {
+            Query query = entityManager.createQuery(jpql);
+            query.setParameter("userId", userId);
+            return (User) query.getSingleResult();
+        });
+    }
+
+    @Override
+    public List<User> listUserUnlike() {
+        String jpql = "select u from User u join fetch u.id where u.id is null";
+        return execute(entityManager -> {
+            Query query = entityManager.createQuery(jpql);
+            return (List<User>) query.getResultList();
+        });
+    }
+
+    @Override
+    public List<User> listUserLike(Object videoId) {
+        String jpql = "select f.userId from Favorite f where f.videoId = :videoId";
+        return execute(entityManager -> {
+            Query query = entityManager.createQuery(jpql);
+            query.setParameter("videoId", videoId);
+            return (List<User>) query.getResultList();
+        });
+    }
+
     public List<User> paginate(int page, int size) {
         return super.paginate(User.class, page, size);
-    }
-
-    public long countWithFilter(String filter) {
-        String jpql = "SELECT COUNT(u) FROM User u";
-        jpql = jpql + " WHERE u.email LIKE :email AND u.admin = :role";
-        String finalJpql = jpql;
-        return (long) super.execute(entityManager -> {
-            Query query = entityManager.createQuery(finalJpql);
-            query.setParameter("email", "%" + filter + "%");
-            query.setParameter("role", false);
-            return (long) query.getSingleResult();
-        });
-    }
-
-    public List<User> paginateByEmailAndRole(String email, int pageNumber, int pageSize) {
-        String jpql = "SELECT o FROM User o WHERE o.email LIKE :search AND o.admin = :role";
-        return super.execute(entityManager -> {
-            Query query = entityManager.createQuery(jpql, User.class);
-            query.setParameter("search", "%" + email + "%");
-            query.setParameter("role", false);
-            query.setFirstResult((pageNumber - 1) * pageSize);
-            query.setMaxResults(pageSize);
-            return query.getResultList();
-        });
     }
 
     @Override
@@ -67,6 +72,19 @@ public class UserDaoImpl extends GenericDao<User> implements UserDao {
         return super.execute(entityManager -> {
             Query query = entityManager.createQuery(jpql, User.class);
             query.setParameter("email", email);
+            if (query.getResultList().size() > 0) {
+                return (User) query.getSingleResult();
+            }
+            return null;
+        });
+    }
+
+    @Override
+    public User findByShareId(Object videoId) {
+        String jpql = "SELECT o FROM Share o WHERE o.videoId.id = :videoId";
+        return execute(entityManager -> {
+            Query query = entityManager.createQuery(jpql, User.class);
+            query.setParameter("videoId", videoId);
             if (query.getResultList().size() > 0) {
                 return (User) query.getSingleResult();
             }

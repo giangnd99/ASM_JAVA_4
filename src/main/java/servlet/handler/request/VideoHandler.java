@@ -61,6 +61,8 @@ public class VideoHandler extends AbstractHandler<Video> {
             return "watch";
         } else if (action.equals("unlike")) {
             return "unlike";
+        } else if (action.equals("share")) {
+            return "share";
         }
         return "like";
     }

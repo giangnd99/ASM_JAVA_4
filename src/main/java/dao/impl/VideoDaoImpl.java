@@ -72,6 +72,24 @@ public class VideoDaoImpl extends GenericDao<Video> implements VideoDao {
         });
     }
 
+    @Override
+    public List<Video> findByFavorite(Object userId) {
+        String jpql = "select f.videoId from Favorite f where f.userId.id = ?1 ";
+        return execute(entityManager -> {
+            Query query = entityManager.createQuery(jpql);
+            query.setParameter(1, userId);
+            return query.getResultList();
+        });
+    }
+
+    @Override
+    public List<Video> findByShare(String userId) {
+        String jpql = "select s.videoId from Share s";
+        return execute(entityManager -> {
+            Query query = entityManager.createQuery(jpql);
+            return query.getResultList();
+        });
+    }
 
 
 }
