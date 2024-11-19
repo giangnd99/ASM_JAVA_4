@@ -10,7 +10,7 @@
 </div>
 <nav class="navbar navbar-expand-lg">
     <div class="container-fluid">
-        <a class="navbar-brand" href="#">
+        <a class="navbar-brand" href="/home">
             <i class="fas fa-film mr-2"></i>
             Video Entertainment
         </a>
@@ -81,8 +81,9 @@
 
 <div class="tm-hero d-flex justify-content-center align-items-center" data-parallax="scroll"
      data-image-src="img/hero.jpg">
-    <form class="d-flex tm-search-form">
-        <input class="form-control tm-search-input" type="search" placeholder="Search" aria-label="Search">
+    <form class="d-flex tm-search-form" action="${pageContext.request.contextPath}/search">
+        <input class="form-control tm-search-input" name="search" type="search" placeholder="Search"
+               aria-label="Search">
         <button class="btn btn-outline-success tm-search-btn" type="submit">
             <i class="fas fa-search"></i>
         </button>

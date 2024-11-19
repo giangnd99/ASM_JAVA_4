@@ -19,17 +19,17 @@ public class JwtUtil {
     private long expirationTime = 1000 * 60 * 60; // 1 hour
 
     public JwtUtil() {
-        // Generate a random secret key or load from a secure source
         new java.security.SecureRandom().nextBytes(secretKey);
     }
 
     // Generate JWT token with email as subject
-    public String generateToken(String email) {
+    public String generateToken(String email, boolean isAdmin) {
         try {
             // Set JWT claims
             JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                     .subject(email)
                     .issueTime(new Date())
+                    .claim("isAdmin", isAdmin)
                     .expirationTime(new Date(System.currentTimeMillis() + expirationTime))
                     .build();
 
@@ -43,7 +43,6 @@ public class JwtUtil {
         }
     }
 
-    // Validate JWT token
     public boolean validateToken(String token, String email) {
         try {
             SignedJWT signedJWT = SignedJWT.parse(token);
@@ -57,8 +56,21 @@ public class JwtUtil {
         }
     }
 
+    public boolean validateAdminToken(String token, boolean isAdmin) {
+        try {
+            SignedJWT signedJWT = SignedJWT.parse(token);
+            boolean isValidSignature = signedJWT.verify(new MACVerifier(secretKey));
+            boolean extractedRoleAdmin = signedJWT.getJWTClaimsSet().getBooleanClaim("isAdmin");
+            boolean isNotExpired = !isTokenExpired(signedJWT);
+
+            return isValidSignature && extractedRoleAdmin && isNotExpired;
+        } catch (JOSEException | ParseException e) {
+            throw new RuntimeException("Error validating JWT token", e);
+        }
+    }
+
     // Extract email from JWT token
-    public String extractUsername(String token) {
+    public String extractEmail(String token) {
         try {
             SignedJWT signedJWT = SignedJWT.parse(token);
             return signedJWT.getJWTClaimsSet().getSubject();
@@ -85,5 +97,14 @@ public class JwtUtil {
         } catch (ParseException e) {
             throw new RuntimeException("Error extracting expiration date from JWT token", e);
         }
+    }
+
+    /**
+     * Dùng để thay đổi thời gian tồn tại mặc định 1h của token đơn vị là giờ
+     *
+     * @param expirationTimePerHours
+     */
+    public void setExpirationTime(long expirationTimePerHours) {
+        this.expirationTime = 1000 * 60 * 60 * expirationTime;
     }
 }

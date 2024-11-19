@@ -35,4 +35,8 @@ public interface UserDao {
     User findByShareId(Object videoId);
 
     Boolean isExists(Object email);
+
+    User findByUsername(String username);
+
+    User getUserByUserNameOrEmail(String key);
 }

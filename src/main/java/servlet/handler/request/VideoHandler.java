@@ -4,18 +4,23 @@ import constant.MessageType;
 import entity.Video;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import service.HistoryService;
 import service.VideoService;
+import service.impl.HistoryServiceImpl;
 import service.impl.VideoServiceImpl;
 import servlet.handler.AbstractHandler;
 import util.PaginationHelper;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class VideoHandler extends AbstractHandler<Video> {
 
     private VideoService videoService;
     private HistoryHandler historyHandler;
+    private HistoryService historyService;
     private PaginationHelper<Video> paginationVideo;
     private static List<String> cachedHref = new ArrayList<>();
 
@@ -24,10 +29,17 @@ public class VideoHandler extends AbstractHandler<Video> {
         super(req, resp);
         this.videoService = new VideoServiceImpl();
         this.historyHandler = new HistoryHandler(req, resp);
+        this.historyService = new HistoryServiceImpl();
     }
 
     public void loadVideosToHomePage() throws Exception {
         List<Video> videos = videoService.listAll();
+        Map<Video, Integer> mapVideoAndLikeCount = new HashMap<>();
+        Map<Video, Integer> mapVideoAndShareCount = new HashMap<>();
+        for (Video video : videos) {
+            mapVideoAndLikeCount.put(video, historyService.getLikeCount(video.getId()));
+            mapVideoAndShareCount.put(video, historyService.getShareCount(video.getId()));
+        }
         paginationVideo = new PaginationHelper<Video>(videos, PAGE_SIZE);
         List<Video> videoOfPage = paginationVideo.getPage(getPageNumber());
         String homePage = "/views/user/index.jsp";
@@ -47,6 +59,7 @@ public class VideoHandler extends AbstractHandler<Video> {
             historyHandler.doAction(action);
         }
         setViews(video);
+        setHisory();
         setTop5VideoByViews();
         request.setAttribute("video", video);
     }
@@ -121,8 +134,50 @@ public class VideoHandler extends AbstractHandler<Video> {
         return false;
     }
 
+    public void showVideoByTitleContaining() {
+        String keyword = request.getParameter("search");
+        List<Video> videosByTitle = getVideoByTitleContaining(keyword);
+        request.setAttribute("search", keyword);
+        request.setAttribute("videos", videosByTitle);
+    }
+
+    public List<Video> getVideoByTitleContaining(String keyword) {
+        List<Video> videosByTitle = videoService.findByTitleContaining(keyword);
+        if (videosByTitle == null || videosByTitle.size() == 0) {
+            setMessage(MessageType.ERROR, "Không tìm thấy video với từ khóa");
+            return null;
+        }
+        return videosByTitle;
+    }
+
     public void setTop5VideoByViews(){
-        List<Video> top5Views = videoService.top5VideoByViews();
-        request.setAttribute("top5Videos", top5Views);
+        List<Video> top10Views = videoService.top10VideoByViews();
+        request.setAttribute("top5Videos", top10Views);
+    }
+
+
+    public void showListVideoByFilter() {
+        String keyword = request.getParameter("filter");
+        switch (keyword) {
+            case "time":
+                setListVideoIn2024();
+                break;
+            case "likes":
+                break;
+        }
+    }
+
+    public void setTop10VideoByLikes() {
+        request.setAttribute("videos", videoService.getListVideoSortByLike());
+    }
+
+    public void setListVideoIn2024() {
+        List<Video> listVideoIn2024 = videoService.getListVideoIn2024();
+        request.setAttribute("videos", listVideoIn2024);
+    }
+
+    public void setHisory() {
+        historyHandler.setLikeCount();
+        historyHandler.setShareCount();
     }
 }

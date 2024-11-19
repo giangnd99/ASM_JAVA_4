@@ -50,4 +50,16 @@ public class UserServiceImp implements UserService {
     public boolean isExistEmail(String email) {
         return userDao.isExists(email);
     }
+
+    @Override
+    public User findByUsername(String username) {
+        return userDao.findByUsername(username);
+    }
+
+    @Override
+    public User finByUsernameOrEmail(String key) {
+        return userDao.getUserByUserNameOrEmail(key);
+    }
+
+
 }

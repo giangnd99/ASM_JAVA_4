@@ -106,4 +106,40 @@ public class UserDaoImpl extends GenericDao<User> implements UserDao {
             return false;
         }
     }
+
+    @Override
+    public User findByUsername(String username) {
+        String jpql = "select u from User u where u.username = ?1";
+        return execute(entityManager ->
+        {
+            Query query = entityManager.createQuery(jpql);
+            query.setParameter(1, username);
+            List<User> users = query.getResultList();
+            if (users.size() > 0) {
+                return users.get(0);
+            }
+            return null;
+        });
+    }
+
+    @Override
+    public User getUserByUserNameOrEmail(String key) {
+        String jpql = "select u from User u where u.username = ?1 or u.email = ?2";
+        return execute(entityManager -> {
+            Query query = entityManager.createQuery(jpql);
+            query.setParameter(1, key);
+            query.setParameter(2, key);
+            List<User> users = (List<User>) query.getResultList();
+            if (users.size() > 0) {
+                return users.get(0);
+            }
+            return null;
+        });
+    }
+
+    public static void main(String[] args) {
+        UserDaoImpl userDao = new UserDaoImpl();
+        User user = userDao.getUserByUserNameOrEmail("nguyenvana@fpt.edu.vn");
+        System.out.println(user);
+    }
 }

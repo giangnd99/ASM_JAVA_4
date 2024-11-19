@@ -25,5 +25,9 @@ public interface VideoService {
 
      List<Video> listFavVideoByUser(List<Favorite> favorites);
 
-     List<Video> top5VideoByViews();
+     List<Video> top10VideoByViews();
+
+    List<Video> getListVideoIn2024();
+
+    List<Video> getListVideoSortByLike();
 }

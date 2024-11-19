@@ -34,8 +34,9 @@
                     </figcaption>
                 </figure>
                 <div class="d-flex justify-content-between tm-text-gray">
-                    <span class="tm-text-gray-light">18 Oct 2020</span>
-                    <span>${video.views} views</span>
+                    <span class="tm-text-gray-light">${shareCount}</span>
+                    <span class="tm-text-gray-light">${likeCount}</span>
+                    <span class="tm-text-gray-light">${video.views} views</span>
                 </div>
             </div>
         </c:forEach>

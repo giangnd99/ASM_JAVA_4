@@ -32,9 +32,17 @@
                     <p> ${video.description}</p>
                 </div>
                 <div class="mb-4 d-flex flex-wrap">
-                    <div class="mr-4 mb-2">
+                    <div class="mr-4 m-3">
                         <span class="tm-text-gray-dark">Lượt xem: </span><span
                             class="tm-text-primary">${video.views}</span>
+                    </div>
+                    <div class="mr-4 m-3">
+                        <span class="tm-text-gray-dark">Lượt thích: </span><span
+                            class="tm-text-primary">${likeCount}</span>
+                    </div>
+                    <div class="mr-4 m-3">
+                        <span class="tm-text-gray-dark">Lượt share: </span><span
+                            class="tm-text-primary">${shareCount}</span>
                     </div>
                 </div>
                 <c:if test="${favorite != null}">

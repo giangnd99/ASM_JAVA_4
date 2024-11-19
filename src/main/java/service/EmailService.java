@@ -11,4 +11,8 @@ public interface EmailService {
     boolean sendEmailChangePassword(EmailUtil email);
 
     boolean sendEmailResetPassword(EmailUtil email);
+
+    String appendBody(EmailUtil email, String body);
+
+    String appendTitle(EmailUtil email, String title);
 }

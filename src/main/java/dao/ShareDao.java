@@ -15,4 +15,12 @@ public interface ShareDao {
     Share update(Share entity);
 
     boolean delete(Object id);
+
+    Long countByVideoId(Object videoId);
+
+    Share findLatestShareDate(Integer videoId);
+
+    Share findByHref(String href);
+
+    Share findOldestShareDate(Integer videoId);
 }

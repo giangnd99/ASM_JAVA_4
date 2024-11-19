@@ -10,6 +10,8 @@ public interface HistoryService {
 
     List<Favorite> getAllFavorites();
 
+    Share getSharesByHref(String href);
+
     List<Favorite> getFavoritesByUser(User currentUser);
 
     List<Share> getSharesByUser(User currentUser);
@@ -23,4 +25,16 @@ public interface HistoryService {
     Share findShareById(User currentUser, String href);
 
     boolean removeFavorite(Favorite favorite);
+
+    int getLikeCount(Object videoId);
+
+    int getShareCount(Object videoId);
+
+    String getLatestLikeDate(Integer id);
+
+    String getOldestLikeDate(Integer id);
+
+    Share getLatestShare(Integer id);
+
+    Share getOldestShare(Integer id);
 }

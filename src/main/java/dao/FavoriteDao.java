@@ -17,4 +17,10 @@ public interface FavoriteDao {
     Favorite update(Favorite favorite);
 
     boolean delete(Object id);
+
+    Long countByVideoId(Object videoId);
+
+    Favorite findLatestLikeDate();
+
+    Favorite findOldestLikeDate();
 }

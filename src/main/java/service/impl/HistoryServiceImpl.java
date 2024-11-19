@@ -32,6 +32,11 @@ public class HistoryServiceImpl implements HistoryService {
     }
 
     @Override
+    public Share getSharesByHref(String href) {
+        return shareDao.findByHref(href);
+    }
+
+    @Override
     public List<Favorite> getFavoritesByUser(User currentUser) {
         Integer idUser = currentUser.getId();
         return favoriteDao.findByUser(idUser);
@@ -81,5 +86,35 @@ public class HistoryServiceImpl implements HistoryService {
     @Override
     public boolean removeFavorite(Favorite favorite) {
         return favoriteDao.delete(favorite.getId());
+    }
+
+    @Override
+    public int getLikeCount(Object videoId) {
+        return favoriteDao.countByVideoId(videoId).intValue();
+    }
+
+    @Override
+    public int getShareCount(Object videoId) {
+        return shareDao.countByVideoId(videoId).intValue();
+    }
+
+    @Override
+    public String getLatestLikeDate(Integer id) {
+        return favoriteDao.findLatestLikeDate().getLikedDate().toString();
+    }
+
+    @Override
+    public String getOldestLikeDate(Integer id) {
+        return favoriteDao.findOldestLikeDate().getLikedDate().toString();
+    }
+
+    @Override
+    public Share getLatestShare(Integer idVideo) {
+        return shareDao.findLatestShareDate(idVideo);
+    }
+
+    @Override
+    public Share getOldestShare(Integer idVideo) {
+        return shareDao.findOldestShareDate(idVideo);
     }
 }

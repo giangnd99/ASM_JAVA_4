@@ -25,30 +25,32 @@ public class AuthenticationFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
+        if (authenticationHandler == null) {
         authenticationHandler = new AuthenticationHandler(httpRequest, httpResponse);
-
-        // Kiểm tra người dùng đang đăng nhập thông qua JWT
-        User loggedUser = authenticationHandler.loggedUser();
-
-        // Các trang yêu cầu đăng nhập
+        }
+        httpRequest.setCharacterEncoding("UTF-8");
+        httpResponse.setCharacterEncoding("UTF-8");
         List<String> protectedUrls = Arrays.asList("/admin", "/account-setting");
         String requestPath = httpRequest.getRequestURI().substring(httpRequest.getContextPath().length());
 
-        // Kiểm tra nếu request đang truy cập vào trang yêu cầu đăng nhập
         boolean isProtectedPage = protectedUrls.stream().anyMatch(requestPath::startsWith);
 
-        if (isProtectedPage && !isLoggedIn()) {
-            // Nếu là trang bảo vệ và người dùng chưa đăng nhập -> chuyển hướng về login
+        if (isProtectedPage & !isLoggedIn(httpRequest)) {
+
             String contextPath = httpRequest.getContextPath();
             authenticationHandler.setMessage(MessageType.INFO, "Bạn phải đăng nhập để tiếp tục");
             httpResponse.sendRedirect(contextPath + "/login");
         } else {
-            // Nếu người dùng đã đăng nhập hoặc không cần đăng nhập cho trang này -> tiếp tục request
             chain.doFilter(request, response);
         }
     }
 
-    boolean isLoggedIn() {
-        return authenticationHandler.loggedUser() != null;
+    boolean isLoggedIn(HttpServletRequest request) {
+        User user = authenticationHandler.loggedUser();
+        if (user != null) {
+            request.getSession().setAttribute("loggedUser", user);
+            return true;
+        }
+        return false;
     }
 }

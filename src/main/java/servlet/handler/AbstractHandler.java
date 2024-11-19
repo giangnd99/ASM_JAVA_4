@@ -1,14 +1,15 @@
 package servlet.handler;
 
-import constant.Image;
 import constant.MessageType;
 import entity.User;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.Part;
+import service.UserService;
+import service.impl.UserServiceImp;
+import util.JwtUtil;
 import util.PaginationHelper;
-import util.XImage;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -21,17 +22,21 @@ public class AbstractHandler<T> {
     protected HttpServletResponse response;
     private int pageNumber;
     protected boolean result;
-    protected int PAGE_SIZE = 5;
+    protected int PAGE_SIZE = 8;
     protected String message;
     protected MessageType messageType = MessageType.INFO;
     protected User CURRENT_USER;
     protected String CURRENT_HREF;
+    protected JwtUtil jwtUtil;
+    protected UserService  userService;
 
     public AbstractHandler(HttpServletRequest request, HttpServletResponse response) {
         this.request = request;
         this.response = response;
         this.CURRENT_USER = getCurrentUser();
         this.CURRENT_HREF = getCurrentVideoHref();
+        this.jwtUtil = new JwtUtil();
+        this.userService = new UserServiceImp();
     }
 
     /**
@@ -47,9 +52,6 @@ public class AbstractHandler<T> {
                 field.setAccessible(true);
                 String parameterValue = request.getParameter(field.getName());
                 if (parameterValue != null && !parameterValue.isEmpty()) {
-                    if (parameterValue.equals(Image.IMAGE_FIELD)) {
-                        processImageField(field, entity);
-                    }
                     Object value = convertToFieldType(parameterValue, field.getType());
                     field.set(entity, value);
                 }
@@ -124,17 +126,6 @@ public class AbstractHandler<T> {
         return pageNumber;
     }
 
-    private void processImageField(Field field, T entity) throws IOException, IllegalAccessException, ServletException {
-        Part part = request.getPart(field.getName());
-        if (part != null && part.getSize() > 0) {
-            String fileName = saveImage(part);
-            field.set(entity, fileName);
-        }
-    }
-
-    private String saveImage(Part part) throws IOException {
-        return XImage.uploadAndSaveImage(part, Image.SAVE_DIRECTORY);
-    }
 
     /**
      * Tính toán các thông tin phân trang và gán vào request.
@@ -167,9 +158,21 @@ public class AbstractHandler<T> {
 
     protected User getCurrentUser() {
         CURRENT_USER = (User) request.getSession().getAttribute("loggedUser");
+
         return CURRENT_USER == null ? null : CURRENT_USER;
     }
 
+    protected String extractTokenFromCookies() {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("jwt".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
+    }
     protected String getCurrentVideoHref() {
         return request.getParameter("id");
     }
@@ -184,5 +187,6 @@ public class AbstractHandler<T> {
     public boolean isLoggedIn() {
         return CURRENT_USER != null;
     }
+
 }
 

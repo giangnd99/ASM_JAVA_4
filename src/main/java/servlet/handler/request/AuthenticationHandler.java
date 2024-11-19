@@ -34,41 +34,22 @@ public class AuthenticationHandler extends AbstractHandler<User> {
         if (loginSuccess) {
             response.sendRedirect(request.getContextPath() + "/");
         } else {
-            super.message = "Đăng nhập thất bại";
-            super.messageType = MessageType.ERROR;
-            setMessage(messageType, message);
             showLogin();
         }
     }
 
     private boolean checkLogin() {
-        String email = request.getParameter("email");
+        String key = request.getParameter("email");
         String password = request.getParameter("password");
         String remember = request.getParameter("rememberMe");
 
-        User user = userService.findByEmail(email);
-        if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
-            return false; // Email không tồn tại hoặc mật khẩu sai
+        User userExists = userService.finByUsernameOrEmail(key);
+
+        if (checkUserLogging(userExists, password)) {
+            setJwtWithConditions(remember, userExists);
+            return true;
         }
-
-        // Thiết lập session và lưu JWT
-        request.getSession().setAttribute("useremail", email);
-        request.getSession().setAttribute("loggedUser", user);
-
-        // Tạo JWT token và lưu vào cookie nếu cần "Remember Me"
-        String token = jwtUtil.generateToken(email);
-        request.getSession().setAttribute("token", token);
-
-        if ("on".equals(remember)) {
-            Cookie jwtCookie = new Cookie("jwt", token);
-            jwtCookie.setHttpOnly(true);
-            jwtCookie.setSecure(true);
-            jwtCookie.setPath("/");
-            jwtCookie.setMaxAge(7 * 24 * 60 * 60); // Token lưu trong 7 ngày
-            response.addCookie(jwtCookie);
-        }
-
-        return true;
+        return false;
     }
 
     public void logout() throws IOException {
@@ -84,48 +65,27 @@ public class AuthenticationHandler extends AbstractHandler<User> {
     }
 
     public void createTokenForUser(User user) {
-        // Tạo JWT token cho người dùng
-        String token = jwtUtil.generateToken(user.getEmail());
+        String token = jwtUtil.generateToken(user.getEmail(), user.isAdmin());
 
-        // Lưu token vào session
         request.getSession().setAttribute("token", token);
         request.getSession().setAttribute("loggedUser", user);
-
-        // Lưu token vào cookie nếu cần
-        Cookie jwtCookie = new Cookie("jwt", token);
-        jwtCookie.setHttpOnly(true);
-        jwtCookie.setSecure(true);
-        jwtCookie.setPath("/"); // Áp dụng cho tất cả các URL
-        jwtCookie.setMaxAge(7 * 24 * 60 * 60); // Token lưu trong 7 ngày
-        response.addCookie(jwtCookie);
     }
 
     public User loggedUser() {
         String token = (String) request.getSession().getAttribute("token");
         if (token == null || token.isEmpty()) {
-            token = extractTokenFromCookies();
+            token = super.extractTokenFromCookies();
         }
 
         if (token == null || token.isEmpty()) {
             return null;
         }
 
-        // Trích xuất email từ token và tìm người dùng từ email
-        String email = jwtUtil.extractUsername(token);
+        String email = jwtUtil.extractEmail(token);
         return email != null ? userService.findByEmail(email) : null;
     }
 
-    private String extractTokenFromCookies() {
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("jwt".equals(cookie.getName())) {
-                    return cookie.getValue();
-                }
-            }
-        }
-        return null;
-    }
+
 
     public void showLogin() {
         String loginPage = "/views/user/login.jsp";
@@ -134,5 +94,44 @@ public class AuthenticationHandler extends AbstractHandler<User> {
         } catch (ServletException | IOException e) {
             throw new RuntimeException("Error displaying login page", e);
         }
+    }
+
+
+    private void setJwtWithConditions(String remember, User user) {
+        if ("on".equals(remember)) {
+            jwtUtil.setExpirationTime(7);
+            String token = jwtUtil.generateToken(user.getEmail(), user.isAdmin());
+            Cookie jwtCookie = new Cookie("jwt", token);
+            jwtCookie.setHttpOnly(true);
+            jwtCookie.setSecure(true);
+            jwtCookie.setPath("/");
+            jwtCookie.setMaxAge(7 * 24 * 60 * 60); // Token lưu trong 7 ngày
+            response.addCookie(jwtCookie);
+        } else {
+            String token = jwtUtil.generateToken(user.getEmail(), user.isAdmin());
+            request.getSession().setAttribute("token", token);
+        }
+        request.getSession().setAttribute("loggedUser", user);
+    }
+
+
+    boolean checkUserLogging(User user, String password) {
+        if (user == null) {
+            message = "Không tồn tại người dùng này";
+            setMessage(MessageType.ERROR, message);
+            return false;
+        } else {
+            return checkPasswordUser(password, user);
+        }
+    }
+
+    boolean checkPasswordUser(String password, User user) {
+        boolean result = passwordEncoder.matches(password, user.getPassword());
+        if (result) {
+            return true;
+        }
+        message = "Mật khẩu không đúng";
+        setMessage(MessageType.ERROR, message);
+        return false;
     }
 }

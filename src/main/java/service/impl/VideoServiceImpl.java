@@ -75,7 +75,17 @@ public class VideoServiceImpl implements VideoService {
     }
 
     @Override
-    public List<Video> top5VideoByViews() {
-        return videoDao.sortByViews().subList(0, 5);
+    public List<Video> top10VideoByViews() {
+        return videoDao.sortByViews().subList(0, 10);
+    }
+
+    @Override
+    public List<Video> getListVideoIn2024() {
+        return videoDao.findBySharedDateIn2024();
+    }
+
+    @Override
+    public List<Video> getListVideoSortByLike() {
+        return videoDao.sortVideoByLike();
     }
 }

@@ -5,6 +5,7 @@ import dao.VideoDao;
 import entity.Video;
 import jakarta.persistence.Query;
 
+import java.util.Date;
 import java.util.List;
 
 public class VideoDaoImpl extends GenericDao<Video> implements VideoDao {
@@ -73,8 +74,14 @@ public class VideoDaoImpl extends GenericDao<Video> implements VideoDao {
     }
 
     @Override
+    public List<Video> findBySharedDate(Date sharedDate) {
+        String jpql = "select f.videoId from Favorite f where f.sharedDate = ?1 desc limit 10";
+        return findManyThingByJpql(jpql, sharedDate);
+    }
+
+    @Override
     public List<Video> findByFavorite(Object userId) {
-        String jpql = "select f.videoId from Favorite f where f.userId.id = ?1 ";
+        String jpql = "select f.videoId from Favorite f  where f.userId.id = ?1";
         return execute(entityManager -> {
             Query query = entityManager.createQuery(jpql);
             query.setParameter(1, userId);
@@ -85,6 +92,43 @@ public class VideoDaoImpl extends GenericDao<Video> implements VideoDao {
     @Override
     public List<Video> findByShare(String userId) {
         String jpql = "select s.videoId from Share s";
+        return execute(entityManager -> {
+            Query query = entityManager.createQuery(jpql);
+            return query.getResultList();
+        });
+    }
+
+    @Override
+    public List<Video> sortVideoByLike() {
+        String jpql = "select v from Video v join Favorite f on v.id = f.videoId.id group by v.id order by count(f.videoId.id)";
+        return execute(entityManager -> {
+            Query query = entityManager.createQuery(jpql);
+            query.setMaxResults(10);
+            return query.getResultList();
+        });
+    }
+
+    @Override
+    public List<Video> sortVideoByShare() {
+        String jpql = "select  v from Video v join Share s on v.id = s.videoId.id group by v.id order by count(s.videoId.id)";
+        return execute(entityManager -> {
+            Query query = entityManager.createQuery(jpql);
+            return query.getResultList();
+        });
+    }
+
+        @Override
+        public List<Video> findBySharedDateIn2024() {
+            String jpql = "select s.videoId from Share s where year(s.shareDate) = 2024 group by s.videoId.id order by s.shareDate desc";
+            return execute(entityManager -> {
+                Query query = entityManager.createQuery(jpql);
+                return query.getResultList();
+            });
+        }
+
+    @Override
+    public List<Video> findVideoNotExistsInFavorite() {
+        String jpql = "select v from Video v left join Favorite f on v.id = f.videoId.id where f.videoId.id is null";
         return execute(entityManager -> {
             Query query = entityManager.createQuery(jpql);
             return query.getResultList();
