@@ -17,16 +17,54 @@ import java.io.IOException;
 public class AuthenticationHandler extends AbstractHandler<User> {
 
     private UserService userService;
-    private final BCryptPasswordEncoder passwordEncoder;
-    private final JwtUtil jwtUtil;
+    private BCryptPasswordEncoder passwordEncoder;
+    private JwtUtil jwtUtil;
 
 
     public AuthenticationHandler(HttpServletRequest request, HttpServletResponse response) {
         super(request, response);
-        this.userService = new UserServiceImp();
-        this.passwordEncoder = new BCryptPasswordEncoder();
-        this.jwtUtil = new JwtUtil();
-        this.userService = new UserServiceImp();
+    }
+
+    BCryptPasswordEncoder getPasswordEncoder() {
+        if (passwordEncoder == null) {
+            this.passwordEncoder = new BCryptPasswordEncoder();
+        }
+        return passwordEncoder;
+    }
+
+    JwtUtil getJwtUtil() {
+        if (jwtUtil == null) {
+            this.jwtUtil = new JwtUtil();
+        }
+        return jwtUtil;
+    }
+
+    UserService getUserService() {
+        if (userService == null) {
+            this.userService = new UserServiceImp();
+        }
+        return userService;
+    }
+
+    public void showLogin() {
+        String loginPage = "/views/user/login.jsp";
+        try {
+            super.forward(loginPage);
+        } catch (ServletException | IOException e) {
+            throw new RuntimeException("Error displaying login page", e);
+        }
+    }
+
+    public void doLogout() throws IOException {
+        request.getSession().invalidate();
+        // Xóa cookie nếu tồn tại
+        Cookie jwtCookie = new Cookie("jwt", null);
+        jwtCookie.setHttpOnly(true);
+        jwtCookie.setSecure(true);
+        jwtCookie.setPath("/");
+        jwtCookie.setMaxAge(0); // Xóa cookie ngay lập tức
+        response.addCookie(jwtCookie);
+        redirectToHome();
     }
 
     public void doLogin() throws IOException {
@@ -43,7 +81,7 @@ public class AuthenticationHandler extends AbstractHandler<User> {
         String password = request.getParameter("password");
         String remember = request.getParameter("rememberMe");
 
-        User userExists = userService.finByUsernameOrEmail(key);
+        User userExists = getUserService().finByUsernameOrEmail(key);
 
         if (checkUserLogging(userExists, password)) {
             setJwtWithConditions(remember, userExists);
@@ -52,72 +90,66 @@ public class AuthenticationHandler extends AbstractHandler<User> {
         return false;
     }
 
-    public void logout() throws IOException {
-        request.getSession().invalidate();
-        // Xóa cookie nếu tồn tại
-        Cookie jwtCookie = new Cookie("jwt", null);
-        jwtCookie.setHttpOnly(true);
-        jwtCookie.setSecure(true);
-        jwtCookie.setPath("/");
-        jwtCookie.setMaxAge(0); // Xóa cookie ngay lập tức
-        response.addCookie(jwtCookie);
-        redirectToHome();
-    }
 
     public void createTokenForUser(User user) {
-        String token = jwtUtil.generateToken(user.getEmail(), user.isAdmin());
+        String token = getJwtUtil().generateToken(user.getEmail(), user.isAdmin());
 
         request.getSession().setAttribute("token", token);
         request.getSession().setAttribute("loggedUser", user);
     }
 
-    public User loggedUser() {
-        String token = (String) request.getSession().getAttribute("token");
-        if (token == null || token.isEmpty()) {
-            token = super.extractTokenFromCookies();
+    public User getLoggedUser() {
+        User currentUser = getCurrentUser();
+        if (currentUser == null) {
+            String email = getEmailFromCookie();
+            if (email != null) {
+                currentUser = getUserService().findByEmail(email);
+            }
         }
-
-        if (token == null || token.isEmpty()) {
-            return null;
-        }
-
-        String email = jwtUtil.extractEmail(token);
-        return email != null ? userService.findByEmail(email) : null;
+        return currentUser;
     }
 
 
-
-    public void showLogin() {
-        String loginPage = "/views/user/login.jsp";
-        try {
-            super.forward(loginPage);
-        } catch (ServletException | IOException e) {
-            throw new RuntimeException("Error displaying login page", e);
-        }
-    }
-
-
-    private void setJwtWithConditions(String remember, User user) {
+    public void setJwtWithConditions(String remember, User user) {
         if ("on".equals(remember)) {
-            jwtUtil.setExpirationTime(7);
-            String token = jwtUtil.generateToken(user.getEmail(), user.isAdmin());
-            Cookie jwtCookie = new Cookie("jwt", token);
-            jwtCookie.setHttpOnly(true);
-            jwtCookie.setSecure(true);
-            jwtCookie.setPath("/");
-            jwtCookie.setMaxAge(7 * 24 * 60 * 60); // Token lưu trong 7 ngày
-            response.addCookie(jwtCookie);
+            setJwtCookieOnClickRemember(user);
         } else {
-            String token = jwtUtil.generateToken(user.getEmail(), user.isAdmin());
-            request.getSession().setAttribute("token", token);
+            setJwtSession(user);
         }
+        setUserInSession(user);
+    }
+
+    public void setJwtCookieOnClickRemember(User user) {
+        getJwtUtil().setExpirationTime(7);
+        String token = getJwtUtil().generateToken(user.getEmail(), user.isAdmin());
+        response.addCookie(getJwtCookieConfigRemember(token));
+    }
+
+    public void setJwtSession(User user) {
+        String token = getJwtUtil().generateToken(user.getEmail(), user.isAdmin());
+        request.getSession().setAttribute("token", token);
+    }
+
+    public void setUserInSession(User user) {
         request.getSession().setAttribute("loggedUser", user);
     }
 
+    public Cookie getJwtCookieConfigRemember(String token) {
+        Cookie jwtCookie = new Cookie("jwt", token);
+        jwtCookie.setHttpOnly(true);
+        jwtCookie.setSecure(true);
+        jwtCookie.setPath("/");
+        jwtCookie.setMaxAge(7 * 24 * 60 * 60);
+        return jwtCookie;
+    }
 
     boolean checkUserLogging(User user, String password) {
         if (user == null) {
             message = "Không tồn tại người dùng này";
+            setMessage(MessageType.ERROR, message);
+            return false;
+        } else if (!user.isActive()) {
+            message = "Người dùng này bị cấm hoạt động";
             setMessage(MessageType.ERROR, message);
             return false;
         } else {
@@ -126,7 +158,7 @@ public class AuthenticationHandler extends AbstractHandler<User> {
     }
 
     boolean checkPasswordUser(String password, User user) {
-        boolean result = passwordEncoder.matches(password, user.getPassword());
+        boolean result = getPasswordEncoder().matches(password, user.getPassword());
         if (result) {
             return true;
         }

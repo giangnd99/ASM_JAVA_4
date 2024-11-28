@@ -19,7 +19,8 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 public class Favorite implements Serializable {
     private static final long serialVersionUID = 1L;
-
+    @Version  // Trường phiên bản cho Optimistic Locking
+    private int version;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;

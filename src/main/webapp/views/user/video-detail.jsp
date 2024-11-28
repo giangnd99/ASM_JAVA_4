@@ -23,7 +23,16 @@
     </div>
     <div class="row tm-mb-90">
         <div class="col-xl-8 col-lg-7 col-md-6 col-sm-12">
-            <iframe style="height: 100%" id="tm-video" src="https://www.youtube.com/embed/${video.href}"></iframe>
+            <iframe
+                    id="tm-video"
+                    data-id="${video.href}"
+                    data-baseuri="${baseUri}"
+                    src="https://www.youtube.com/embed/${video.href}"
+                    frameborder="0"
+                    allow="autoplay; encrypted-media"
+                    allowfullscreen>
+            </iframe>
+
         </div>
         <div class="col-xl-4 col-lg-5 col-md-6 col-sm-12">
             <div class="tm-bg-gray tm-video-details">
@@ -65,46 +74,26 @@
                 <div class="d-inline-flex align-content-center">
                     <c:if test="${favorite ==null }">
                         <div class="text-center m-2">
-                            <a href="${baseUri}/video-detail?action=like&id=${video.href}"
-                               class="btn btn-primary">Thích</a>
+                            <a id="like-btn" href="${baseUri}/video-detail?action=like&id=${video.href}"
+                               class="btn btn-success">Thích</a>
                         </div>
                     </c:if>
                     <c:if test="${favorite !=null }">
                         <div class="text-center m-2">
-                            <a href="${baseUri}/video-detail?action=unlike&id=${video.href}" class="btn btn-primary">Bỏ
+                            <a href="${baseUri}/video-detail?action=unlike&id=${video.href}" class="btn btn-danger">Bỏ
                                 Thích</a>
                         </div>
 
                     </c:if>
                     <div class="text-center m-2">
-                        <a href="${baseUri}/video-detail?action=share" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@getbootstrap" class="btn btn-primary">Chia sẻ</a>
-
-                        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h1 class="modal-title fs-5" id="exampleModalLabel">New message</h1>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <form>
-                                            <div class="mb-3">
-                                                <label for="recipient-name" class="col-form-label">Recipient:</label>
-                                                <input type="text" class="form-control" id="recipient-name">
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="message-text" class="col-form-label">Message:</label>
-                                                <textarea class="form-control" id="message-text"></textarea>
-                                            </div>
-                                        </form>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                        <button type="button" class="btn btn-primary">Send message</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <c:if test="${loggedUser != null}">
+                            <a href="${baseUri}/video-detail?action=share" data-bs-toggle="modal"
+                               data-bs-target="#exampleModal" data-bs-whatever="@getbootstrap" class="btn btn-warning">Chia
+                                sẻ</a>
+                        </c:if>
+                        <jsp:include page="/layout/shareModal.jsp">
+                            <jsp:param name="href" value="${video.href}"/>
+                        </jsp:include>
                     </div>
                 </div>
             </div>
@@ -112,7 +101,7 @@
     </div>
     <div class="row mb-4">
         <h2 class="col-12 tm-text-primary">
-            5 Videos được xem nhiều nhất
+            Videos được xem nhiều nhất
         </h2>
     </div>
     <div class="row mb-3 tm-gallery">
@@ -122,16 +111,43 @@
                 <img src="${video.poster}" alt="Image" class="img-fluid">
                 <figcaption class="d-flex align-items-center justify-content-center">
                     <h2>${video.title}</h2>
-                    <a href="${baseUri}/video-detail?id=${video.href}">Xem thêm</a>
+                    <a href="${baseUri}/video-detail?id=${video.href}&action=watch">Xem thêm</a>
                 </figcaption>
             </figure>
             <div class="d-flex justify-content-between tm-text-gray">
                 <span>${video.views} views</span>
             </div>
         </div>
+
         </c:forEach>
+        <div class="row tm-mb-90">
+            <div class="col-12 d-flex justify-content-between align-items-center tm-paging-col">
+                <c:if test="${totalPages >= 1}">
+                    <c:set var="pageNumber" value="${pageNumber}"/>
+
+                    <!-- Nút Lùi -->
+                    <a href="${prevPageHref}&id=${video.href}&action=watch"
+                       class="btn btn-primary tm-btn-prev mb-2 ${prevPageClass}">Lùi</a>
+
+                    <!-- Liên kết các trang -->
+                    <div class="tm-paging d-flex">
+                        <c:forEach var="i" items="${pageLinks}">
+                            <c:set var="pageLinkClass" value="${pageNumber == i ? 'active' : ''}"/>
+                            <a class="tm-paging-link ${pageLinkClass}"
+                               href="${baseUri}/video-detail?pageNumber=${i}&id=${video.href}&action=watch">${i}</a>
+                        </c:forEach>
+                    </div>
+
+                    <!-- Nút Tiếp -->
+                    <a href="${nextPageHref}&id=${video.href}&action=watch"
+                       class="btn btn-primary tm-btn-next ${nextPageClass}">Tiếp</a>
+                </c:if>
+            </div>
+        </div>
     </div> <!-- row -->
-</div> <!-- container-fluid, tm-container-content -->
+</div>
 <jsp:include page="../../layout/footer.jsp"/>
+
 </body>
+
 </html>

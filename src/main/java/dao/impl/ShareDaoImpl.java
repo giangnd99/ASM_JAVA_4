@@ -15,6 +15,16 @@ public class ShareDaoImpl extends GenericDao<Share> implements ShareDao {
     }
 
     @Override
+    public List<Share> findListByHref(Object href) {
+        String jpql = "select s from Share s where s.videoId.href = ?1 ";
+        return execute(entityManager -> {
+            Query query = entityManager.createQuery(jpql);
+            query.setParameter(1, href);
+            return query.getResultList();
+        });
+    }
+
+    @Override
     public List<Share> findByUserIdAndVideoId(Object userId, Object videoId) {
         String jpql = "select s from Share s where s.userId.id = ?1 and s.videoId.id = ?2 ";
         return super.findManyThingByJpql(jpql, userId, videoId);
@@ -41,20 +51,6 @@ public class ShareDaoImpl extends GenericDao<Share> implements ShareDao {
         return execute(entityManager -> {
             Query query = entityManager.createQuery(jpql);
             query.setParameter("idVideo", idVideo);
-            List<Share> list = query.getResultList();
-            if (list == null || list.size() == 0) {
-                return null;
-            }
-            return (Share) query.getSingleResult();
-        });
-    }
-
-    @Override
-    public Share findByHref(String href) {
-        String jpql = "select s from Share s where s.videoId.href = ?1 ";
-        return execute(entityManager -> {
-            Query query = entityManager.createQuery(jpql);
-            query.setParameter(1, href);
             List<Share> list = query.getResultList();
             if (list == null || list.size() == 0) {
                 return null;

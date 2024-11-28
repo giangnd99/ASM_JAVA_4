@@ -10,6 +10,8 @@ public interface FavoriteDao {
 
     List<Favorite> findByUser(Object id);
 
+    List<Favorite> findByHref(Object href);
+
     List<Favorite> findByUserIdAndVideoId(Object userId, Object videoId);
 
     Favorite create(Favorite favorite);
@@ -23,4 +25,5 @@ public interface FavoriteDao {
     Favorite findLatestLikeDate();
 
     Favorite findOldestLikeDate();
+
 }

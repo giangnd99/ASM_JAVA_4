@@ -18,7 +18,11 @@ public class ListVideoByFavorite extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         historyHandler = new HistoryHandler(req, resp);
         String favoritePage = "/views/user/favorite-video.jsp";
-        historyHandler.showFavVideoByCurrentUser();
+        try {
+            historyHandler.showFavVideoByCurrentUser();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         req.getRequestDispatcher(favoritePage).forward(req, resp);
     }
 }

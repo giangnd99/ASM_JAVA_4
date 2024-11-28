@@ -6,8 +6,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import service.UserService;
-import service.impl.UserServiceImp;
 import util.JwtUtil;
 import util.PaginationHelper;
 
@@ -27,16 +25,12 @@ public class AbstractHandler<T> {
     protected MessageType messageType = MessageType.INFO;
     protected User CURRENT_USER;
     protected String CURRENT_HREF;
-    protected JwtUtil jwtUtil;
-    protected UserService  userService;
 
     public AbstractHandler(HttpServletRequest request, HttpServletResponse response) {
         this.request = request;
         this.response = response;
         this.CURRENT_USER = getCurrentUser();
         this.CURRENT_HREF = getCurrentVideoHref();
-        this.jwtUtil = new JwtUtil();
-        this.userService = new UserServiceImp();
     }
 
     /**
@@ -158,10 +152,13 @@ public class AbstractHandler<T> {
 
     protected User getCurrentUser() {
         CURRENT_USER = (User) request.getSession().getAttribute("loggedUser");
-
-        return CURRENT_USER == null ? null : CURRENT_USER;
+        return CURRENT_USER;
     }
 
+    protected String getEmailFromCookie() {
+        String token = extractTokenFromCookies();
+        return token != null ? JwtUtil.extractEmail(token) : null;
+    }
     protected String extractTokenFromCookies() {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
@@ -173,6 +170,7 @@ public class AbstractHandler<T> {
         }
         return null;
     }
+
     protected String getCurrentVideoHref() {
         return request.getParameter("id");
     }
@@ -184,6 +182,7 @@ public class AbstractHandler<T> {
     public void redirectToHome() throws IOException {
         response.sendRedirect("home");
     }
+
     public boolean isLoggedIn() {
         return CURRENT_USER != null;
     }

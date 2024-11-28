@@ -30,6 +30,7 @@ public interface UserDao {
     List<User> listUserLike(Object videoId);
 
     User findByEmail(String email);
+    List<User> listUserShare(Object videoId);
 
     /* Người dùng u share video v */
     User findByShareId(Object videoId);

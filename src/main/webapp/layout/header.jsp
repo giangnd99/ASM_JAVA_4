@@ -40,7 +40,7 @@
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
-                            <li><a class="dropdown-item" href="${baseUri}/fogotpassword">Quên mật khẩu</a></li>
+                            <li><a class="dropdown-item" href="${baseUri}/forgot-password">Quên mật khẩu</a></li>
                         </ul>
                     </li>
                 </c:if>
@@ -54,7 +54,6 @@
                         </a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="${baseUri}/favorite-video">Videos bạn yêu thích</a></li>
-                            <li><a class="dropdown-item" href="${baseUri}">video được chia sẽ</a></li>
                         </ul>
                     </li>
                     <li class="nav-item dropdown">
@@ -62,9 +61,9 @@
                            data-bs-toggle="dropdown"
                            aria-expanded="false">Xin Chào, ${loggedUser.fullname}</a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="${baseUri}/account-setting?email=${loggedUser.email}">Thông
+                            <li><a class="dropdown-item" href="${baseUri}/account-setting">Thông
                                 tin</a></li>
-                            <li><a class="dropdown-item" href="${baseUri}/change-password?email=${loggedUser.email}">Đổi
+                            <li><a class="dropdown-item" href="${baseUri}/change-password">Đổi
                                 mật khẩu</a></li>
                             <li>
                                 <hr class="dropdown-divider">

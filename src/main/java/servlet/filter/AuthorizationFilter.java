@@ -9,7 +9,7 @@ import servlet.handler.session.SessionHandler;
 
 import java.io.IOException;
 
-@WebFilter("/admin")
+@WebFilter({"/admin", "/admin/*"})
 public class AuthorizationFilter implements Filter {
 
     private SessionHandler sessionHandler;
@@ -19,7 +19,7 @@ public class AuthorizationFilter implements Filter {
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
 
-        sessionHandler = new SessionHandler(req, res);
+        sessionHandler = new SessionHandler(req);
         boolean isAdmin = sessionHandler.isAdminLogged();
         if (isAdmin) {
             chain.doFilter(request, response);

@@ -28,23 +28,27 @@ public class AuthenticationFilter implements Filter {
         authenticationHandler = new AuthenticationHandler(httpRequest, httpResponse);
         httpRequest.setCharacterEncoding("UTF-8");
         httpResponse.setCharacterEncoding("UTF-8");
-        List<String> protectedUrls = Arrays.asList("/admin", "/account-setting");
-        String requestPath = httpRequest.getRequestURI().substring(httpRequest.getContextPath().length());
 
-        boolean isProtectedPage = protectedUrls.stream().anyMatch(requestPath::startsWith);
+        boolean isProtectedPage = getUrlProtected().stream().anyMatch(getCurrentRequestPath(httpRequest)::startsWith);
 
         if (isProtectedPage & !isLoggedIn(httpRequest)) {
-
-            String contextPath = httpRequest.getContextPath();
             authenticationHandler.setMessage(MessageType.INFO, "Bạn phải đăng nhập để tiếp tục");
-            httpResponse.sendRedirect(contextPath + "/login");
+            httpRequest.getRequestDispatcher("/login").forward(request, response);
         } else {
             chain.doFilter(request, response);
         }
     }
 
+    String getCurrentRequestPath(HttpServletRequest request) {
+        return request.getRequestURI().substring(request.getContextPath().length());
+    }
+
+    List<String> getUrlProtected() {
+        return Arrays.asList("/admin", "/account-setting", "/change-password", "/reset-password", "/video-detail/like", "/video-detail/share");
+    }
+
     boolean isLoggedIn(HttpServletRequest request) {
-        User user = authenticationHandler.loggedUser();
+        User user = authenticationHandler.getLoggedUser();
         if (user != null) {
             request.getSession().setAttribute("loggedUser", user);
             return true;

@@ -17,7 +17,8 @@ import java.io.Serializable;
 public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
+    @Version  // Trường phiên bản cho Optimistic Locking
+    private int version;
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -3,39 +3,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Admin Dashboard</title>
+    <title>Video Management</title>
     <jsp:include page="head.jsp"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
 </head>
 <body class="bg-light">
-<div class="container d-flex">
+<div class="container d-flex mb-5">
     <!-- Sidebar -->
     <jsp:include page="side-bar.jsp"/>
-    <!-- Trang nội dung -->
+    <!-- Main Content -->
     <div class="container-fluid px-4 my-4">
-        <!-- Tabs -->
-        <nav class="navbar bg-body-tertiary">
-            <div class="container-fluid">
-                <form class="d-flex" role="search">
-                    <div class="form-check-inline">
-                        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                    </div>
-                    <div class="form-floating me-2">
-                        <select class="form-select" id="floatingSelect" aria-label="Floating label select example">
-                            <option selected>Open this select menu</option>
-                            <option value="1">One</option>
-                            <option value="2">Two</option>
-                            <option value="3">Three</option>
-                        </select>
-                        <label for="floatingSelect">Check by video title:</label>
-                    </div>
-                    <div class="form-floating me-2">
-                        <button class="btn btn-outline-success" type="submit">Search</button>
-                    </div>
-
-                </form>
+        <!-- Filters -->
+        <div class="filters mb-4">
+            <div class="row">
+                <div class="col-md-4">
+                    <label for="videoFilter" class="form-label">Video Title</label>
+                    <select id="videoFilter" class="form-select">
+                        <option value="all" selected>All Videos</option>
+                        <!-- Populate this dynamically -->
+                    </select>
+                </div>
             </div>
-        </nav>
+        </div>
+
+        <!-- Tabs -->
         <ul class="nav nav-tabs" id="videoTab" role="tablist">
             <li class="nav-item m-0 p-3" role="presentation">
                 <button class="nav-link active" id="favorites-tab" data-bs-toggle="tab"
@@ -74,19 +65,10 @@
                             <th>Oldest Date</th>
                         </tr>
                         </thead>
-                        <tbody>
-                        <c:forEach var="history" items="${histories}">
-                            <tr>
-                                <td>${history.videoTitle}</td>
-                                <td>${history.likeCount}</td>
-                                <td>${history.likeDateLatest}</td>
-                                <td>${history.likeDateOldest}</td>
-                            </tr>
-                        </c:forEach>
+                        <tbody id="favoritesTableBody">
                         </tbody>
                     </table>
                 </div>
-
             </div>
 
             <!-- Favorite Users Section -->
@@ -96,26 +78,13 @@
                     <table class="table table-bordered text-center">
                         <thead class="table-light">
                         <tr>
-                            <th>Video Title</th>
                             <th>Username</th>
                             <th>Fullname</th>
                             <th>Email</th>
                             <th>Favorite Date</th>
                         </tr>
                         </thead>
-                        <tbody>
-                        <c:forEach var="history" items="${histories}">
-                            <c:if test="${history.isFavoriteUserSection()}">
-                                <tr>
-                                    <td>${history.videoTitle}</td>
-                                    <td>${history.username}</td>
-                                    <td>${history.fullname}</td>
-                                    <td>${history.email}</td>
-                                    <td>${history.favoriteDate}</td>
-                                </tr>
-                            </c:if>
-                        </c:forEach>
-
+                        <tbody id="favoriteUsersTableBody">
                         </tbody>
                     </table>
                 </div>
@@ -128,36 +97,21 @@
                     <table class="table table-bordered text-center">
                         <thead class="table-light">
                         <tr>
-                            <th>Video Title</th>
                             <th>Sender Name</th>
                             <th>Sender Email</th>
                             <th>Receiver Email</th>
-                            <th>Date Latest</th>
-                            <th>Date Oldest</th>
+                            <th>Send Date</th>
                         </tr>
                         </thead>
-                        <tbody>
-                        <c:forEach var="history" items="${histories}">
-                            <c:if test="${history.isSharedFriendSection()}">
-                                <tr>
-                                    <td>${history.videoTitle}</td>
-                                    <td>${history.senderName}</td>
-                                    <td>${history.senderEmail}</td>
-                                    <td>${history.receiverEmail}</td>
-                                    <td>${history.shareDateLatest}</td>
-                                    <td>${history.shareDateOldest}</td>
-                                </tr>
-                            </c:if>
-                        </c:forEach>
+                        <tbody id="sharedFriendsTableBody">
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
     </div>
-
-
 </div>
 <jsp:include page="footer.jsp"/>
+<script src="<c:url value="/js/api/HistoryAPI.js"/>"></script>
 </body>
 </html>

@@ -4,7 +4,6 @@ package servlet.handler.session;
 import entity.User;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.Getter;
 import service.UserService;
@@ -18,14 +17,24 @@ public class SessionHandler {
     private HttpSession session;
     private JwtUtil jwtUtil;
     private HttpServletRequest request;
-    private HttpServletResponse response;
 
-    public SessionHandler(HttpServletRequest req, HttpServletResponse resp) {
+    public SessionHandler(HttpServletRequest req) {
         this.session = req.getSession();
-        this.jwtUtil = new JwtUtil();
-        this.userService = new UserServiceImp();
         this.request = req;
-        this.response = resp;
+    }
+
+    JwtUtil getJwtUtil() {
+        if (jwtUtil == null) {
+            jwtUtil = new JwtUtil();
+        }
+        return jwtUtil;
+    }
+
+    UserService getUserService() {
+        if (this.userService == null) {
+            this.userService = new UserServiceImp();
+        }
+        return this.userService;
     }
 
     public void setSessionAttribute(Object attribute) {
@@ -48,8 +57,8 @@ public class SessionHandler {
         if (token == null) {
             return null;
         }
-        String email = jwtUtil.extractEmail(token);
-        return userService.findByEmail(email);
+        String email = getJwtUtil().extractEmail(token);
+        return getUserService().findByEmail(email);
     }
 
     public String checkAdminLogged() {

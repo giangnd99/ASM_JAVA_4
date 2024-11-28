@@ -21,7 +21,7 @@ CREATE TABLE video (
     href VARCHAR(50) NOT NULL UNIQUE,
     poster VARCHAR(255),
     views INT NOT NULL DEFAULT 0,
-    description NVARCHAR(255) NOT NULL,
+    description text NOT NULL,
     isActive BIT NOT NULL DEFAULT 0
 );
 
@@ -41,7 +41,7 @@ CREATE TABLE share (
 	id INT auto_increment PRIMARY KEY,
 	userId INT,
     videoId INT,
-    emails varchar(50),
+    emails text,
     shareDate DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (userId) REFERENCES user(id),
     FOREIGN KEY (videoId) REFERENCES video(id)

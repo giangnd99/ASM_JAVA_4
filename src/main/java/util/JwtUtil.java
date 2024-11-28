@@ -70,7 +70,7 @@ public class JwtUtil {
     }
 
     // Extract email from JWT token
-    public String extractEmail(String token) {
+    public static String extractEmail(String token) {
         try {
             SignedJWT signedJWT = SignedJWT.parse(token);
             return signedJWT.getJWTClaimsSet().getSubject();

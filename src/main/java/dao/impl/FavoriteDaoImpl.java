@@ -21,6 +21,16 @@ public class FavoriteDaoImpl extends GenericDao<Favorite> implements FavoriteDao
     }
 
     @Override
+    public List<Favorite> findByHref(Object href) {
+        String jpql = "select f from Favorite f where f.videoId.href = ?1 ";
+        return execute(entityManager -> {
+            Query query = entityManager.createQuery(jpql);
+            query.setParameter(1, href);
+            return query.getResultList();
+        });
+    }
+
+    @Override
     public List<Favorite> findByUserIdAndVideoId(Object userId, Object videoId) {
         String jpql = "select f from Favorite f where f.userId.id = ?1 and f.videoId.id = ?2 ";
         return super.findManyThingByJpql(jpql, userId, videoId);

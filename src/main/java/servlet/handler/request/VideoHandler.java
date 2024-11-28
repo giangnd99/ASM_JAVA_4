@@ -12,17 +12,15 @@ import servlet.handler.AbstractHandler;
 import util.PaginationHelper;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class VideoHandler extends AbstractHandler<Video> {
 
-    private VideoService videoService;
-    private HistoryHandler historyHandler;
-    private HistoryService historyService;
+    private final VideoService videoService;
+    private final HistoryHandler historyHandler;
+    private final HistoryService historyService;
     private PaginationHelper<Video> paginationVideo;
-    private static List<String> cachedHref = new ArrayList<>();
+    private final static List<String> cachedHref = new ArrayList<>();
 
 
     public VideoHandler(HttpServletRequest req, HttpServletResponse resp) {
@@ -34,13 +32,7 @@ public class VideoHandler extends AbstractHandler<Video> {
 
     public void loadVideosToHomePage() throws Exception {
         List<Video> videos = videoService.listAll();
-        Map<Video, Integer> mapVideoAndLikeCount = new HashMap<>();
-        Map<Video, Integer> mapVideoAndShareCount = new HashMap<>();
-        for (Video video : videos) {
-            mapVideoAndLikeCount.put(video, historyService.getLikeCount(video.getId()));
-            mapVideoAndShareCount.put(video, historyService.getShareCount(video.getId()));
-        }
-        paginationVideo = new PaginationHelper<Video>(videos, PAGE_SIZE);
+        paginationVideo = new PaginationHelper<>(videos, PAGE_SIZE);
         List<Video> videoOfPage = paginationVideo.getPage(getPageNumber());
         String homePage = "/views/user/index.jsp";
         setupPagination(paginationVideo);
@@ -54,44 +46,21 @@ public class VideoHandler extends AbstractHandler<Video> {
         String href = request.getParameter("id");
         Video video = videoService.findByHref(href);
         addHrefToCache();
-        String action = getAction();
+        String action = historyHandler.getAction();
         if (action != null) {
             historyHandler.doAction(action);
         }
-        setViews(video);
         setHisory();
         setTop5VideoByViews();
         request.setAttribute("video", video);
     }
 
-    public String getAction() {
-        String action = request.getParameter("action");
-        if (CURRENT_USER == null) {
-            message = "Vui lòng đăng nhập để like";
-            setMessage(MessageType.WARNING, message);
-            return null;
-        } else if (action == null) {
-            return "watch";
-        } else if (action.equals("unlike")) {
-            return "unlike";
-        } else if (action.equals("share")) {
-            return "share";
-        }
-        return "like";
-    }
-
-    private void setViews(Video video) throws Exception {
-        String action = getAction();
-        if (action == null || action.equals("watch")) {
-            doViews(video);
-        }
-    }
-
-    private void doViews(Video video) throws Exception {
-        int view = video.getViews();
-        view++;
-        video.setViews(view);
-        videoService.update(video);
+    public void setTop5VideoByViews() {
+        List<Video> top10Views = videoService.top10VideoByViews();
+        PaginationHelper<Video> pagination = new PaginationHelper<>(top10Views, PAGE_SIZE);
+        List<Video> videoOfPage = pagination.getPage(getPageNumber());
+        setupPagination(pagination);
+        request.setAttribute("top5Videos", videoOfPage);
     }
 
     public void showCurrentlyVideos() {
@@ -148,11 +117,6 @@ public class VideoHandler extends AbstractHandler<Video> {
             return null;
         }
         return videosByTitle;
-    }
-
-    public void setTop5VideoByViews(){
-        List<Video> top10Views = videoService.top10VideoByViews();
-        request.setAttribute("top5Videos", top10Views);
     }
 
 

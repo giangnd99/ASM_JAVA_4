@@ -24,9 +24,8 @@ public class LoggedFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
-        if (sessionHandler == null) {
-            sessionHandler = new SessionHandler(req, res);
-        }
+        sessionHandler = new SessionHandler(req);
+
         logService = new LogServiceImpl();
         String emailCurrentUser = sessionHandler.getLoggedUser().getEmail();
         if (!usersLogged.contains(emailCurrentUser)) {

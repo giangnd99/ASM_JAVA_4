@@ -42,12 +42,12 @@ public class GenericDao<E> {
     }
 
     public Boolean deleteById(Object id) {
-        excuteInTransaction(entityManager -> {
+        return Boolean.logicalOr(excuteInTransaction(entityManager -> {
             E entity = entityManager.find(type, id);
             entityManager.remove(entity);
             return true;
-        });
-        return false;
+        }), Boolean.FALSE);
+
     }
 
 

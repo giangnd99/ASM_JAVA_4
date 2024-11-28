@@ -39,8 +39,8 @@
                     <form method="POST">
                         <!-- Form Group (username)-->
                         <div class="mb-3">
-                            <label class="small mb-1" for="inputUsername">Họ và tên</label>
-                            <input class="form-control" id="inputUsername" type="text" placeholder="Nhập họ và tên"
+                            <label class="small mb-1" for="inputFullname">Họ và tên</label>
+                            <input class="form-control" id="inputFullname" type="text" placeholder="Nhập họ và tên"
                                    value="${loggedUser.fullname}" name="fullname">
                         </div>
                         <!-- Form Group (email address)-->
@@ -48,6 +48,11 @@
                             <label class="small mb-1" for="inputEmailAddress">địa chỉ Email</label>
                             <input class="form-control" id="inputEmailAddress" type="email"
                                    placeholder="Nhập vào email" value="${loggedUser.email}" name="email">
+                        </div>
+                        <div class="mb-3">
+                            <label class="small mb-1" for="inputUsername">Username</label>
+                            <input class="form-control" id="inputUsername" type="text"
+                                   placeholder="Nhập vào username" value="${loggedUser.username}" name="username">
                         </div>
                         <!-- Save changes button-->
                         <button class="btn btn-primary" type="submit"

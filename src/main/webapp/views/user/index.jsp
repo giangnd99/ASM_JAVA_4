@@ -30,7 +30,7 @@
                             class="d-flex align-items-center justify-content-center"
                     >
                         <h2>${video.title}</h2>
-                        <a href="${baseUri}/video-detail?id=${video.href}">Xem thêm</a>
+                        <a href="${baseUri}/video-detail?action=watch&id=${video.href}">Xem thêm</a>
                     </figcaption>
                 </figure>
                 <div class="d-flex justify-content-between tm-text-gray">

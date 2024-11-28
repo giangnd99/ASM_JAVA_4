@@ -8,6 +8,8 @@ public interface ShareDao {
 
     List<Share> findByUser(Object id);
 
+    List<Share> findListByHref(Object href);
+
     List<Share> findByUserIdAndVideoId(Object userId, Object videoId);
 
     Share create(Share entity);
@@ -19,8 +21,6 @@ public interface ShareDao {
     Long countByVideoId(Object videoId);
 
     Share findLatestShareDate(Integer videoId);
-
-    Share findByHref(String href);
 
     Share findOldestShareDate(Integer videoId);
 }

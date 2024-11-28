@@ -17,8 +17,6 @@ public class ManagerServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String userManage = "/views/admin/manage-history.jsp";
-        historyHandler = new HistoryHandler(req, resp);
-        historyHandler.showAllVideoHistory();
         req.getRequestDispatcher(userManage).forward(req, resp);
     }
 }

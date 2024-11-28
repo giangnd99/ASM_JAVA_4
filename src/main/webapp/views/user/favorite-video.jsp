@@ -19,7 +19,7 @@
 <c:set var="baseUri" value="${pageContext.request.contextPath}"/>
 <div class="container-fluid tm-container-content tm-mt-60">
     <div class="row mb-4">
-        <h2 class="col-6 tm-text-primary">Video mới xem</h2>
+        <h2 class="col-6 tm-text-primary">Video bạn yêu thích</h2>
     </div>
     <div class="row tm-mb-90 tm-gallery">
         <c:forEach var="video" items="${videos}">
@@ -47,8 +47,13 @@
                             Thích</a>
                     </div>
                     <div class="text-center m-2">
-                        <a href="${baseUri}/favorite-video?action=share" class="btn btn-info rounded rounded-3">Chia sẻ</a>
+                        <a href="${baseUri}/favorite-video?action=share&id=${video.href}"
+                           class="btn btn-info rounded rounded-3" data-bs-toggle="modal"
+                           data-bs-target="#exampleModal" data-bs-whatever="@getbootstrap">Chia sẻ</a>
                     </div>
+                    <jsp:include page="/layout/shareModal.jsp">
+                        <jsp:param name="href" value="${video.href}"/>
+                    </jsp:include>
                 </div>
             </div>
         </c:forEach>

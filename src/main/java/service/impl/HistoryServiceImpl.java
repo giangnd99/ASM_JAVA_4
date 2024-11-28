@@ -32,8 +32,13 @@ public class HistoryServiceImpl implements HistoryService {
     }
 
     @Override
-    public Share getSharesByHref(String href) {
-        return shareDao.findByHref(href);
+    public List<Share> getSharesByHref(String href) {
+        return shareDao.findListByHref(href);
+    }
+
+    @Override
+    public List<Favorite> getFavoritesByHref(String href) {
+        return favoriteDao.findByHref(href);
     }
 
     @Override
@@ -64,6 +69,7 @@ public class HistoryServiceImpl implements HistoryService {
         Share share = new Share();
         share.setUserId(currentUser);
         share.setVideoId(currentVideo);
+        share.setEmails(emails);
         return shareDao.create(share);
     }
 

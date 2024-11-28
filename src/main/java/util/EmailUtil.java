@@ -16,8 +16,8 @@ import java.util.Properties;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EmailUtil {
-    private final String HOST_EMAIL = "nguyendanggiang99@gmail.com";
-    private final String PASSWORD = "bmdl exir oumv ipsk";
+    private static final String HOST_EMAIL = "nguyendanggiang99@gmail.com";
+    private static final String PASSWORD = "bmdl exir oumv ipsk";
     private String[] recipients;
     private String[] ccReciptients;
     private String[] bccReciptients;
@@ -25,13 +25,13 @@ public class EmailUtil {
     private String messageBody;
     private Multipart attachments;
 
-    public boolean sendEmail(EmailUtil email) {
+    public static boolean sendEmail(EmailUtil email) {
         
         try {
             Session session = createSession();
             Message message = new MimeMessage(session);
             message.setFrom(new InternetAddress(HOST_EMAIL));
-            message.setRecipients(Message.RecipientType.TO, convertToAddresses(recipients));
+            message.setRecipients(Message.RecipientType.TO, convertToAddresses(email.getRecipients()));
             if (email.getCcReciptients() != null)
                 message.setRecipients(Message.RecipientType.CC, convertToAddresses(email.getCcReciptients()));
             if (email.getBccReciptients() != null)
@@ -52,7 +52,7 @@ public class EmailUtil {
         }
     }
 
-    private Session createSession() {
+    private static Session createSession() {
         Properties prop = new Properties();
         prop.put("mail.smtp.auth", "true");
         prop.put("mail.smtp.port", "587");
@@ -68,7 +68,7 @@ public class EmailUtil {
         });
     }
 
-    private Address[] convertToAddresses(String[] emails) throws AddressException {
+    private static Address[] convertToAddresses(String[] emails) throws AddressException {
         Address[] addresses = new Address[emails.length];
         for (int i = 0; i < emails.length; i++) {
             addresses[i] = new InternetAddress(emails[i].trim());

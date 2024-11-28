@@ -10,7 +10,10 @@ public interface HistoryService {
 
     List<Favorite> getAllFavorites();
 
-    Share getSharesByHref(String href);
+    List<Share> getSharesByHref(String href);
+
+
+    List<Favorite> getFavoritesByHref(String href);
 
     List<Favorite> getFavoritesByUser(User currentUser);
 

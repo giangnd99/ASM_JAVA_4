@@ -16,9 +16,6 @@
     <a href="${baseUri}/admin/manage-history" class="list-group-item list-group-item-action bg-transparent second-text fw-bold">
         <i class="fas fa-project-diagram me-2"></i>History
     </a>
-    <a href="#" class="list-group-item list-group-item-action bg-transparent second-text fw-bold">
-        <i class="fas fa-comments me-2"></i>Comment
-    </a>
     <a href="${baseUri}/logout" class="list-group-item list-group-item-action bg-transparent text-danger fw-bold">
         <i class="fas fa-power-off me-2"></i>Logout
     </a>

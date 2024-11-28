@@ -80,6 +80,16 @@ public class UserDaoImpl extends GenericDao<User> implements UserDao {
     }
 
     @Override
+    public List<User> listUserShare(Object videoId) {
+        String jpql = "SELECT o FROM Share o WHERE o.videoId.id = :videoId";
+        return execute(entityManager -> {
+            Query query = entityManager.createQuery(jpql, User.class);
+            query.setParameter("videoId", videoId);
+            return (List<User>) query.getResultList();
+        });
+    }
+
+    @Override
     public User findByShareId(Object videoId) {
         String jpql = "SELECT o FROM Share o WHERE o.videoId.id = :videoId";
         return execute(entityManager -> {
