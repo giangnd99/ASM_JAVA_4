@@ -47,7 +47,7 @@ public class HistoryHandler extends AbstractHandler<Video> {
         }
         List<Favorite> favoritesByUser = historyService.getFavoritesByUser(CURRENT_USER);
         List<Video> favoriteVideoByUser = videoService.listFavVideoByUser(favoritesByUser);
-        request.setAttribute("videos", favoriteVideoByUser);
+        request.setAttribute("videos", VideoHandler.getActiveVideo(favoriteVideoByUser));
         request.setAttribute("favUser", favoritesByUser);
     }
 

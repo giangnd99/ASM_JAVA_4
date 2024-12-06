@@ -30,13 +30,23 @@ public class VideoHandler extends AbstractHandler<Video> {
         this.historyService = new HistoryServiceImpl();
     }
 
+    public static List<Video> getActiveVideo(List<Video> videos) {
+        List<Video> activeListVideo = new ArrayList<>();
+        for (Video video : videos) {
+            if (video.isActive()) {
+                activeListVideo.add(video);
+            }
+        }
+        return activeListVideo;
+    }
     public void loadVideosToHomePage() throws Exception {
         List<Video> videos = videoService.listAll();
+
         paginationVideo = new PaginationHelper<>(videos, PAGE_SIZE);
         List<Video> videoOfPage = paginationVideo.getPage(getPageNumber());
         String homePage = "/views/user/index.jsp";
         setupPagination(paginationVideo);
-        request.setAttribute("videos", videoOfPage);
+        request.setAttribute("videos", getActiveVideo(videoOfPage));
         message = message == null ? "" : message;
         super.setMessage(messageType, message);
         super.forward(homePage);
@@ -68,7 +78,7 @@ public class VideoHandler extends AbstractHandler<Video> {
         paginationVideo = new PaginationHelper<>(currentlyVideos, PAGE_SIZE);
         List<Video> videoOfPage = paginationVideo.getPage(getPageNumber());
         setupPagination(paginationVideo);
-        request.setAttribute("videos", videoOfPage);
+        request.setAttribute("videos", getActiveVideo(videoOfPage));
         message = message == null ? "" : message;
         super.setMessage(messageType, message);
     }
@@ -107,7 +117,7 @@ public class VideoHandler extends AbstractHandler<Video> {
         String keyword = request.getParameter("search");
         List<Video> videosByTitle = getVideoByTitleContaining(keyword);
         request.setAttribute("search", keyword);
-        request.setAttribute("videos", videosByTitle);
+        request.setAttribute("videos", getActiveVideo(videosByTitle));
     }
 
     public List<Video> getVideoByTitleContaining(String keyword) {

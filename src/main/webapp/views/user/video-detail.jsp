@@ -101,7 +101,7 @@
     </div>
     <div class="row mb-4">
         <h2 class="col-12 tm-text-primary">
-            Videos được xem nhiều nhất
+            Videos được xem nhiều
         </h2>
     </div>
     <div class="row mb-3 tm-gallery">

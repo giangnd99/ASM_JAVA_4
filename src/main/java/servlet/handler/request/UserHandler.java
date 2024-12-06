@@ -234,6 +234,9 @@ public class UserHandler extends AbstractHandler<User> {
     public void sendEmailPassword() {
         EmailUtil emailUtil = new EmailUtil();
         User userForgot = getUserForgot();
+        if (userForgot == null) {
+            return;
+        }
         String[] email = new String[1];
         email[0] = userForgot.getEmail();
         emailUtil.setRecipients(email);
@@ -249,6 +252,11 @@ public class UserHandler extends AbstractHandler<User> {
 
     public User getUserForgot() {
         String email = request.getParameter("email");
+        User user = userService.findByEmail(email);
+        if (user == null) {
+            setMessage(MessageType.ERROR, "Không tồn tại email này");
+            return null;
+        }
         return userService.findByEmail(email);
     }
 }
